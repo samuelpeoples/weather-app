@@ -9,14 +9,14 @@
 	</head>
 	<body>
 		<main>
-			<div></div>
-			<div id="weatherContainer">
-				<li id="weatherLocation">Location:</li>
-				<li id="weatherDate">Date</li>
-				<li id="weatherHighs">Highs</li>
-				<li id="weatherLows">Lows</li>
-				<li id="weatherCondition">Conditions:</li>
-				<li id="weatherDescription">Description:</li>
+			<form action="">
+				<label for="search-prompt">Location:</label>
+				<input type="text" name="search-prompt" id="search-prompt" placeholder="Detroit" required>
+				
+				<input type="submit" value="Search" id="search-btn">
+			</form>
+			<div>
+				<ul id="weatherContainer"></ul>
 			</div>
 		</main>
 	</body>

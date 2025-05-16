@@ -4,7 +4,6 @@ const API_KEY = "YRGBLQUXG9KJ7E4NBYBHBEPMH";
 const weatherPrompt = null;
 let promptValue;
 let existingData;
-let instance = null;
 let previousSearch;
 if (localStorage.getItem("lastSearch") != undefined) previousSearch = JSON.parse(localStorage.getItem("lastSearch"));
 if (localStorage.getItem("dataSet") != undefined) existingData = JSON.parse(localStorage.getItem("dataSet"));
@@ -19,12 +18,11 @@ async function fetchWeather(search) {
 		existingData = data;
 		previousSearch = search;
 		localStorage.setItem("lastSearch", JSON.stringify(search));
+	} else {
+		console.log("already loaded, not fetching");
 	}
-	else{
-		console.log('already loaded');
-	}
-	instance = new WeatherPack(existingData);
-	generateData();
+	let instance = new WeatherPack(existingData);
+	generateData(instance);
 }
 
 // function fetchWeather(search) {
@@ -52,11 +50,27 @@ async function fetchWeather(search) {
 // 		});
 // }
 
-function generateData() {}
+function generateData(instance) {
+	const arr = {
+		Location: instance.loc,
+		Date: instance.date,
+		Highs: instance.tempHigh,
+		Lows: instance.tempLow,
+		// Conditions: instance.conditions,
+		Description: instance.description,
+	};
+	const weatherContainer = document.getElementById("weatherContainer");
+	weatherContainer.innerHTML = '';
+	for (const [key, value] of Object.entries(arr)) {
+		const item = document.createElement("li");
+		item.textContent = `${key}: ${value}`;
+		weatherContainer.appendChild(item);
+	}
+}
 
 class WeatherPack {
 	constructor(weather) {
-		this.id = new Date().getTime;
+		this.id = new Date().getTime();
 		this.loc = weather.resolvedAddress;
 		this.date = weather.days[0].datetime;
 		this.tempHigh = weather.days[0].tempmax;
@@ -66,7 +80,16 @@ class WeatherPack {
 	}
 }
 
-fetchWeather("japan")
-	.catch((err) => {
-		console.error("invalid input:", err);
-	});
+const searchButton = document.getElementById('search-btn');
+searchButton.addEventListener('click', (e) => {
+	e.preventDefault();
+if (document.getElementById("search-prompt").value === previousSearch) return;
+
+	promptValue = document.getElementById("search-prompt").value;
+	console.log(promptValue);
+	fetchWeather(promptValue).catch((err) => {
+	console.error("invalid input:", err);
+});
+})
+
+fetchWeather(previousSearch);
