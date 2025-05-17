@@ -11,9 +11,13 @@
 		<main>
 			<form action="">
 				<label for="search-prompt">Location:</label>
-				<input type="text" name="search-prompt" id="search-prompt" placeholder="Detroit" required>
-				
-				<input type="submit" value="Search" id="search-btn">
+				<input type="text" name="search-prompt" id="search-prompt" placeholder="Detroit" required />
+				<label for="temp-option">Temperature Type:</label>
+				<select name="temp-option" id="temp-option">
+					<option value="tempF">Fharenheight</option>
+					<option value="tempC">Celsius</option>
+				</select>
+				<button type="submit" value="Search" id="search-btn">Search</button>
 			</form>
 			<div>
 				<ul id="weatherContainer"></ul>

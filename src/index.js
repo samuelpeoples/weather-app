@@ -5,6 +5,7 @@ const weatherPrompt = null;
 let promptValue;
 let existingData;
 let previousSearch;
+let isFahrenheit = true;
 if (localStorage.getItem("lastSearch") != undefined) previousSearch = JSON.parse(localStorage.getItem("lastSearch"));
 if (localStorage.getItem("dataSet") != undefined) existingData = JSON.parse(localStorage.getItem("dataSet"));
 
@@ -51,19 +52,29 @@ async function fetchWeather(search) {
 // }
 
 function generateData(instance) {
+	let highs = instance.tempHigh;
+	let lows = instance.tempLow;
+	let tempsymbol = "°F";
+
+	if (!isFahrenheit) {
+		highs = ((highs - 32) * 5 / 9);
+		lows = ((lows - 32) * 5 / 9);
+		tempsymbol = "°C";
+	}
+
 	const arr = {
 		Location: instance.loc,
 		Date: instance.date,
-		Highs: instance.tempHigh,
-		Lows: instance.tempLow,
+		Highs: `${Math.round(highs)}${tempsymbol}`,
+		Lows: `${Math.round(lows)}${tempsymbol}`,
 		// Conditions: instance.conditions,
 		Description: instance.description,
 	};
 	const weatherContainer = document.getElementById("weatherContainer");
-	weatherContainer.innerHTML = '';
+	weatherContainer.innerHTML = "";
 	for (const [key, value] of Object.entries(arr)) {
 		const item = document.createElement("li");
-		item.textContent = `${key}: ${value}`;
+		item.innerHTML = `<b>${key}:</b> ${value}`;
 		weatherContainer.appendChild(item);
 	}
 }
@@ -80,16 +91,18 @@ class WeatherPack {
 	}
 }
 
-const searchButton = document.getElementById('search-btn');
-searchButton.addEventListener('click', (e) => {
+const searchButton = document.getElementById("search-btn");
+searchButton.addEventListener("click", (e) => {
 	e.preventDefault();
-if (document.getElementById("search-prompt").value === previousSearch) return;
+	if (document.getElementById("temp-option").value == "tempF") isFahrenheit = true;
+	else isFahrenheit = false;
+	console.log(isFahrenheit)
 
 	promptValue = document.getElementById("search-prompt").value;
 	console.log(promptValue);
 	fetchWeather(promptValue).catch((err) => {
-	console.error("invalid input:", err);
+		console.error("invalid input:", err);
+	});
 });
-})
 
 fetchWeather(previousSearch);
