@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
 		<script type="module" src="index.js"></script>
+		<script src="https://kit.fontawesome.com/35918852ab.js" crossorigin="anonymous"></script>
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
@@ -14,13 +15,14 @@
 				<input type="text" name="search-prompt" id="search-prompt" placeholder="Detroit" required />
 				<label for="temp-option">Temperature Type:</label>
 				<select name="temp-option" id="temp-option">
-					<option value="tempF">Fharenheight</option>
+					<option value="tempF">Fahrenheit</option>
 					<option value="tempC">Celsius</option>
 				</select>
 				<button type="submit" value="Search" id="search-btn">Search</button>
 			</form>
-			<div>
-				<ul id="weatherContainer"></ul>
+			<div id="weatherContainer">
+				<ul id="weatherItems"></ul>
+				<i class="weather-icon"></i>
 			</div>
 		</main>
 	</body>

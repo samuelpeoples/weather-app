@@ -57,8 +57,8 @@ function generateData(instance) {
 	let tempsymbol = "°F";
 
 	if (!isFahrenheit) {
-		highs = ((highs - 32) * 5 / 9);
-		lows = ((lows - 32) * 5 / 9);
+		highs = ((highs - 32) * 5) / 9;
+		lows = ((lows - 32) * 5) / 9;
 		tempsymbol = "°C";
 	}
 
@@ -70,13 +70,48 @@ function generateData(instance) {
 		// Conditions: instance.conditions,
 		Description: instance.description,
 	};
-	const weatherContainer = document.getElementById("weatherContainer");
-	weatherContainer.innerHTML = "";
+	const weatherItems = document.getElementById("weatherItems");
+	weatherItems.innerHTML = "";
 	for (const [key, value] of Object.entries(arr)) {
 		const item = document.createElement("li");
 		item.innerHTML = `<b>${key}:</b> ${value}`;
-		weatherContainer.appendChild(item);
+		weatherItems.appendChild(item);
 	}
+	console.log(instance.icon);
+	const weatherIconContainer = document.querySelector(".weather-icon");
+	weatherIconContainer.innerHTML = "";
+	const weatherIcon = document.createElement("i");
+
+	switch (instance.icon) {
+		case "snow":
+			weatherIcon.classList = "weather-icon fa-solid fa-snowflake fa-2x";
+			break;
+		case "rain":
+			weatherIcon.classList = "weather-icon fa-solid fa-cloud-rain fa-2x";
+			break;
+		case "fog":
+			weatherIcon.classList = "weather-icon fa-solid fa-smog fa-2x";
+			break;
+		case "wind":
+			weatherIcon.classList = "weather-icon fa-solid fa-wind fa-2x";
+			break;
+		case "cloudy":
+			weatherIcon.classList = "weather-icon fa-solid fa-cloud fa-2x";
+			break;
+		case "partly-cloudy-day":
+			weatherIcon.classList = "weather-icon fa-solid fa-cloud-sun fa-2x";
+			break;
+		case "partly-cloudy-night":
+			weatherIcon.classList = "weather-icon fa-solid fa-cloud-moon fa-2x";
+			break;
+		case "clear-day":
+			weatherIcon.classList = "weather-icon fa-solid fa-sun fa-2x";
+			break;
+		case "clear-night":
+			weatherIcon.classList = "weather-icon fa-solid fa-moon fa-2x";
+			break;
+	}
+	weatherIconContainer.appendChild(weatherIcon);
 }
 
 class WeatherPack {
@@ -88,6 +123,7 @@ class WeatherPack {
 		this.tempLow = weather.days[0].tempmin;
 		this.conditions = weather.days[0].conditions;
 		this.description = weather.days[0].description;
+		this.icon = weather.days[0].icon;
 	}
 }
 
@@ -96,7 +132,7 @@ searchButton.addEventListener("click", (e) => {
 	e.preventDefault();
 	if (document.getElementById("temp-option").value == "tempF") isFahrenheit = true;
 	else isFahrenheit = false;
-	console.log(isFahrenheit)
+	console.log(isFahrenheit);
 
 	promptValue = document.getElementById("search-prompt").value;
 	console.log(promptValue);
