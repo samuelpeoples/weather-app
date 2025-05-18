@@ -6,6 +6,7 @@ let promptValue;
 let existingData;
 let previousSearch;
 let isFahrenheit = true;
+let isDay = true;
 if (localStorage.getItem("lastSearch") != undefined) previousSearch = JSON.parse(localStorage.getItem("lastSearch"));
 if (localStorage.getItem("dataSet") != undefined) existingData = JSON.parse(localStorage.getItem("dataSet"));
 
@@ -53,19 +54,30 @@ async function fetchWeather(search) {
 
 function generateData(instance) {
 	let highs = instance.tempHigh;
+	let current = instance.tempCurrent;
 	let lows = instance.tempLow;
 	let tempsymbol = "°F";
 
+	isDay = instance.time > instance.sunrise && instance.time < instance.sunset;
+
+	if (isDay) {
+		document.getElementById("content").classList = "";
+	} else {
+		document.getElementById("content").classList = "dark-mode";
+	}
+
 	if (!isFahrenheit) {
 		highs = ((highs - 32) * 5) / 9;
+		current = ((current - 32) * 5) / 9;
 		lows = ((lows - 32) * 5) / 9;
 		tempsymbol = "°C";
 	}
 
 	const arr = {
 		Location: instance.loc,
-		Date: instance.date,
+		Time: instance.time,
 		Highs: `${Math.round(highs)}${tempsymbol}`,
+		Currently: `${Math.round(current)}${tempsymbol}`,
 		Lows: `${Math.round(lows)}${tempsymbol}`,
 		// Conditions: instance.conditions,
 		Description: instance.description,
@@ -77,7 +89,7 @@ function generateData(instance) {
 		item.innerHTML = `<b>${key}:</b> ${value}`;
 		weatherItems.appendChild(item);
 	}
-	console.log(instance.icon);
+
 	const weatherIconContainer = document.querySelector(".weather-icon");
 	weatherIconContainer.innerHTML = "";
 	const weatherIcon = document.createElement("i");
@@ -119,7 +131,11 @@ class WeatherPack {
 		this.id = new Date().getTime();
 		this.loc = weather.resolvedAddress;
 		this.date = weather.days[0].datetime;
+		this.time = weather.currentConditions.datetime;
+		this.sunset = weather.currentConditions.sunset;
+		this.sunrise = weather.currentConditions.sunrise;
 		this.tempHigh = weather.days[0].tempmax;
+		this.tempCurrent = weather.currentConditions.temp;
 		this.tempLow = weather.days[0].tempmin;
 		this.conditions = weather.days[0].conditions;
 		this.description = weather.days[0].description;
@@ -132,10 +148,8 @@ searchButton.addEventListener("click", (e) => {
 	e.preventDefault();
 	if (document.getElementById("temp-option").value == "tempF") isFahrenheit = true;
 	else isFahrenheit = false;
-	console.log(isFahrenheit);
 
 	promptValue = document.getElementById("search-prompt").value;
-	console.log(promptValue);
 	fetchWeather(promptValue).catch((err) => {
 		console.error("invalid input:", err);
 	});
