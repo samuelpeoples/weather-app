@@ -1,8 +1,11 @@
 :root {
+	height: 100%;
+	padding: 0;
 	box-sizing: border-box;
 	--base-background-color: antiquewhite;
 	--base-color: black;
 	--base-border-color: black;
+		
 }
 
 .dark-mode {
@@ -11,24 +14,44 @@
 	--base-border-color: aliceblue;
 }
 
-html body{
+body{
+	margin: 0;
+	padding: 6px;
 	height: 100%;
 	background-color: var(--base-background-color);
 	color: var(--base-color);
 	display: flex;
 }
 
-#weatherContainer {
-	border: 2px solid var(--base-border-color);
-	border-radius: .2rem;
-	padding: 4px 8px;
-	margin-top: 20px;
+#weather-wrapper{
+	display: flex;
+	gap: 20px;
+	overflow: scroll;
+	flex-wrap: wrap;
 }
 
-#weatherContainer > li {
+.weather-container {
+	border: 2px solid var(--base-border-color);
+	border-radius: .6rem;
+	padding: 4px 8px;
+	margin-top: 20px;
+	width: 225px;
+	padding: 15px;
+	padding-left: 40px;
+	position: relative;
+}
+
+.weather-container > ul {
+	padding-left: 0px;
+	margin: 0;
 }
 
 .weather-icon{
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-top: 10px;
+	margin-right: 10px;
 	width: 32px;
 	height: 32px;
 }

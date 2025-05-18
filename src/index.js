@@ -6,7 +6,6 @@ let promptValue;
 let existingData;
 let previousSearch;
 let isFahrenheit = true;
-let isDay = true;
 if (localStorage.getItem("lastSearch") != undefined) previousSearch = JSON.parse(localStorage.getItem("lastSearch"));
 if (localStorage.getItem("dataSet") != undefined) existingData = JSON.parse(localStorage.getItem("dataSet"));
 
@@ -24,7 +23,8 @@ async function fetchWeather(search) {
 		console.log("already loaded, not fetching");
 	}
 	let instance = new WeatherPack(existingData);
-	generateData(instance);
+
+	generateData(instance, 7);
 }
 
 // function fetchWeather(search) {
@@ -52,95 +52,127 @@ async function fetchWeather(search) {
 // 		});
 // }
 
-function generateData(instance) {
-	let highs = instance.tempHigh;
-	let current = instance.tempCurrent;
-	let lows = instance.tempLow;
-	let tempsymbol = "°F";
+function generateData(instance, days) {
 
-	isDay = instance.time > instance.sunrise && instance.time < instance.sunset;
 
-	if (isDay) {
+	if (instance.isDay()) {
 		document.getElementById("content").classList = "";
 	} else {
 		document.getElementById("content").classList = "dark-mode";
 	}
 
+	let current = instance.tempCurrent;
+	let tempsymbol = "°F";
 	if (!isFahrenheit) {
-		highs = ((highs - 32) * 5) / 9;
 		current = ((current - 32) * 5) / 9;
-		lows = ((lows - 32) * 5) / 9;
 		tempsymbol = "°C";
 	}
 
-	const arr = {
+	const arrLoc = {
 		Location: instance.loc,
 		Time: instance.time,
-		Highs: `${Math.round(highs)}${tempsymbol}`,
 		Currently: `${Math.round(current)}${tempsymbol}`,
-		Lows: `${Math.round(lows)}${tempsymbol}`,
-		// Conditions: instance.conditions,
 		Description: instance.description,
 	};
-	const weatherItems = document.getElementById("weatherItems");
-	weatherItems.innerHTML = "";
-	for (const [key, value] of Object.entries(arr)) {
-		const item = document.createElement("li");
+	const locItems = document.getElementById("location-info");
+	locItems.innerHTML = "";
+	for (const [key, value] of Object.entries(arrLoc)) {
+		const item = document.createElement("p");
 		item.innerHTML = `<b>${key}:</b> ${value}`;
-		weatherItems.appendChild(item);
+		locItems.appendChild(item);
 	}
 
-	const weatherIconContainer = document.querySelector(".weather-icon");
-	weatherIconContainer.innerHTML = "";
-	const weatherIcon = document.createElement("i");
+	const weatherWrapper = document.getElementById("weather-wrapper");
+	weatherWrapper.innerHTML = '';
+	for (let index = 0; index < days; index++) {
+		const weatherContainer = document.createElement("div");
+		weatherContainer.className = "weather-container";
+		weatherWrapper.appendChild(weatherContainer);
 
-	switch (instance.icon) {
-		case "snow":
-			weatherIcon.classList = "weather-icon fa-solid fa-snowflake fa-2x";
-			break;
-		case "rain":
-			weatherIcon.classList = "weather-icon fa-solid fa-cloud-rain fa-2x";
-			break;
-		case "fog":
-			weatherIcon.classList = "weather-icon fa-solid fa-smog fa-2x";
-			break;
-		case "wind":
-			weatherIcon.classList = "weather-icon fa-solid fa-wind fa-2x";
-			break;
-		case "cloudy":
-			weatherIcon.classList = "weather-icon fa-solid fa-cloud fa-2x";
-			break;
-		case "partly-cloudy-day":
-			weatherIcon.classList = "weather-icon fa-solid fa-cloud-sun fa-2x";
-			break;
-		case "partly-cloudy-night":
-			weatherIcon.classList = "weather-icon fa-solid fa-cloud-moon fa-2x";
-			break;
-		case "clear-day":
-			weatherIcon.classList = "weather-icon fa-solid fa-sun fa-2x";
-			break;
-		case "clear-night":
-			weatherIcon.classList = "weather-icon fa-solid fa-moon fa-2x";
-			break;
+		let highs = instance.getHighs(index);
+		let lows = instance.getLows(index);
+
+		if (!isFahrenheit) {
+			highs = ((highs - 32) * 5) / 9;
+			lows = ((lows - 32) * 5) / 9;
+		}
+		const date = new Date(instance.getDate(index));
+
+		const arrWeather = {
+			Day: date.toLocaleDateString(date, {weekday: 'long'}),
+			Date: date.toLocaleDateString(date),
+			Highs: `${Math.round(highs)}${tempsymbol}`,
+			Lows: `${Math.round(lows)}${tempsymbol}`,
+			// Conditions: instance.conditions,
+			Description: instance.getDesc(index),
+		};
+
+		const weatherItems = document.createElement("ul");
+		weatherItems.className = "weather-items";
+		weatherContainer.appendChild(weatherItems);
+
+		for (const [key, value] of Object.entries(arrWeather)) {
+			const item = document.createElement("li");
+			item.innerHTML = `<b>${key}:</b> ${value}`;
+			weatherItems.appendChild(item);
+		}
+
+		const weatherIconContainer = document.createElement("i");
+		weatherContainer.appendChild(weatherIconContainer);
+		const weatherIcon = document.createElement("i");
+		weatherIcon.className = "weather-icon";
+		switch (instance.getIcon(index)) {
+			case "snow":
+				weatherIcon.classList = "weather-icon fa-solid fa-snowflake fa-2x";
+				break;
+			case "rain":
+				weatherIcon.classList = "weather-icon fa-solid fa-cloud-rain fa-2x";
+				break;
+			case "fog":
+				weatherIcon.classList = "weather-icon fa-solid fa-smog fa-2x";
+				break;
+			case "wind":
+				weatherIcon.classList = "weather-icon fa-solid fa-wind fa-2x";
+				break;
+			case "cloudy":
+				weatherIcon.classList = "weather-icon fa-solid fa-cloud fa-2x";
+				break;
+			case "partly-cloudy-day":
+				weatherIcon.classList = "weather-icon fa-solid fa-cloud-sun fa-2x";
+				break;
+			case "partly-cloudy-night":
+				weatherIcon.classList = "weather-icon fa-solid fa-cloud-moon fa-2x";
+				break;
+			case "clear-day":
+				weatherIcon.classList = "weather-icon fa-solid fa-sun fa-2x";
+				break;
+			case "clear-night":
+				weatherIcon.classList = "weather-icon fa-solid fa-moon fa-2x";
+				break;
+		}
+		weatherIconContainer.appendChild(weatherIcon);
 	}
-	weatherIconContainer.appendChild(weatherIcon);
 }
 
 class WeatherPack {
 	constructor(weather) {
 		this.id = new Date().getTime();
 		this.loc = weather.resolvedAddress;
-		this.date = weather.days[0].datetime;
+		this.days = weather.days;
 		this.time = weather.currentConditions.datetime;
 		this.sunset = weather.currentConditions.sunset;
 		this.sunrise = weather.currentConditions.sunrise;
-		this.tempHigh = weather.days[0].tempmax;
 		this.tempCurrent = weather.currentConditions.temp;
-		this.tempLow = weather.days[0].tempmin;
-		this.conditions = weather.days[0].conditions;
-		this.description = weather.days[0].description;
-		this.icon = weather.days[0].icon;
+		this.description = weather.description;
 	}
+	isDay = () => this.time > this.sunrise && this.time < this.sunset;
+
+	getDate = (i) => this.days[i].datetime;
+	getHighs = (i) => this.days[i].tempmax;
+	getLows = (i) => this.days[i].tempmin;
+	getCond = (i) => this.days[i].conditions;
+	getDesc = (i) => this.days[i].description;
+	getIcon = (i) => this.days[i].icon;
 }
 
 const searchButton = document.getElementById("search-btn");
